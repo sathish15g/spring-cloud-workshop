@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/microservice
+    username: root
+    password: admin
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  application:
+    name: cable-interent-catalog   
+    
+eureka:
+  client:
+    service-url: 
+      default-zone: http://localhost:8761/eureka
+    
