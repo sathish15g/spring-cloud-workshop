@@ -2,6 +2,11 @@ server:
   port: 8080
   
 spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+    bus:
+      enabled: true
   datasource:
     url: jdbc:mysql://localhost:3306/microservice
     username: root
@@ -13,10 +18,17 @@ spring:
     hibernate:
       ddl-auto: update
   application:
-    name: cable-interent-catalog   
+    name: cable-interent-catalog 
     
 eureka:
   client:
     service-url: 
       default-zone: http://localhost:8761/eureka
+      
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh,refresh
+  
     

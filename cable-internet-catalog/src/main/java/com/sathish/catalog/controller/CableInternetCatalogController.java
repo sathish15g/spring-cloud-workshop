@@ -10,34 +10,43 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.sathish.catalog.configuration.PropertyConfiguation;
 import com.sathish.catalog.model.CableInternetCatalog;
 import com.sathish.catalog.service.CableInternetCatalogService;
 
 @RestController
 public class CableInternetCatalogController {
-	
-	
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private Environment env;
-	
+
 	@Autowired
-	private CableInternetCatalogService catalogService; 
-	
+	private CableInternetCatalogService catalogService;
+
+	@Autowired
+	private PropertyConfiguation config;
+
 	@GetMapping("/catalog-service/{planName}")
+	@HystrixCommand(fallbackMethod = "fallbackRetrieveCatalog")
 	public CableInternetCatalog retrieveCatalog(@PathVariable String planName) {
 		CableInternetCatalog response = catalogService.retrieveCatalog(planName);
 		response.setPort(Integer.parseInt(env.getProperty("local.server.port")));
-		logger.info("retrive plan from catalog service {}",response);
+		logger.info("retrive plan from catalog service {}", response);
 		return response;
-	}	
-	
+	}
+
 	@PostMapping("/catalog-service")
 	public CableInternetCatalog postCatalog(@RequestBody CableInternetCatalog cableInternetCatalog) {
-		logger.info("posting from catalog-service {}" ,cableInternetCatalog);
+		logger.info("posting from catalog-service {}", cableInternetCatalog);
+
 		return catalogService.postCatalog(cableInternetCatalog);
 	}
-	
+
+	public CableInternetCatalog fallbackRetrieveCatalog(String planName) {
+		return new CableInternetCatalog(config.getPlanName(),config.getDownloadSpeed() , config.getUploadSpeed(), config.getChargPerHr(),Integer.parseInt(env.getProperty("local.server.port")));
+	}
 
 }
